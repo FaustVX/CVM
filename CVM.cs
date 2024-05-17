@@ -4,7 +4,7 @@ namespace CVM;
 
 public partial class CVM<T>([Field]int memory)
 {
-    public Random Rng { get; init; } = Random.Shared;
+    public Random Rng { private get; init; } = Random.Shared;
     private int _round = 0;
     private LinkedList<T> _array = new();
 

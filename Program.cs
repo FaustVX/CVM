@@ -1,8 +1,10 @@
 ﻿using CVM;
 
-var cvm = new CVM<int>(100);
+// https://www.quantamagazine.org/computer-scientists-invent-an-efficient-new-way-to-count-20240516/
+var cvm = new CVM<int>(1_000);
 var rng = new Random(0);
-while (true)
+for (var i = 0; i < 1_000_000_000; i++)
 {
     cvm.Process(rng.Next());
 }
+Console.WriteLine(cvm.Count);
