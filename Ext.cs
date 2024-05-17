@@ -4,6 +4,7 @@ namespace CVM;
 public static class Ext
 {
     private static Dictionary<int, int> _powers = [];
+
     public static bool NextBool(this Random rng)
     => rng.Next(2) == 0;
 
