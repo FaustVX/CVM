@@ -15,18 +15,10 @@ public partial class CVM<T>([Field]int memory)
     public void Process(T data)
     {
         if (!_array.Contains(data))
-            if (GenerateBool(_round, Rng))
+            if (Rng.NextBool(_round))
             _array.AddLast(data);
         if (IsFull)
             Clean();
-
-        static bool GenerateBool(int round, Random rng)
-        => round switch
-        {
-            <= 0 => true,
-            1 => rng.NextBool(),
-            _ => rng.NextBool() && GenerateBool(round - 1, rng),
-        };
     }
 
     private void Clean()
