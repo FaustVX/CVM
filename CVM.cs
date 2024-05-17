@@ -2,9 +2,8 @@ using PrimaryParameter.SG;
 
 namespace CVM;
 
-public partial class CVM<T>([Field]int memory)
+public partial class CVM<T>([Field]int memory, [Field(Type = typeof(Random), AssignFormat = "{0} ?? Random.Shared")]Random? rng = default)
 {
-    public Random Rng { private get; init; } = Random.Shared;
     private int _round = 0;
     private LinkedList<T> _array = new();
 
@@ -15,7 +14,7 @@ public partial class CVM<T>([Field]int memory)
     public void Process(T data)
     {
         if (!_array.Contains(data))
-            if (Rng.NextBool(_round))
+            if (_rng.NextBool(_round))
             _array.AddLast(data);
         if (IsFull)
             Clean();
@@ -26,7 +25,7 @@ public partial class CVM<T>([Field]int memory)
         var current = _array.Last;
         while (current is not null)
         {
-            if (Rng.NextBool())
+            if (_rng.NextBool())
             {
                 (current, var next) = (current.Previous, current!);
                 _array.Remove(next);
