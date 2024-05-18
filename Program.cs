@@ -6,6 +6,6 @@ var cvm = new CVM<int>(1_000, new(0));
 var rng = new Random(0);
 
 for (var i = 0; i < 1_000_000; i++)
-    cvm.Process(rng.Next(100_000));
+    cvm.Process(rng.Next(1_000_000));
 
 Console.WriteLine(cvm.Count);
