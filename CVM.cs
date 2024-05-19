@@ -1,3 +1,4 @@
+using System.Threading.Channels;
 using PrimaryParameter.SG;
 
 namespace CVM;
@@ -19,6 +20,21 @@ public partial class CVM<T>([Field]int memory, [Field(Type = typeof(Random), Ass
         if (IsFull)
             Clean();
     }
+
+    public void Process(IEnumerable<T> values)
+    {
+        foreach (T item in values)
+            Process(item);
+    }
+
+    public async Task ProcessAsync(IAsyncEnumerable<T> values)
+    {
+        await foreach (T item in values)
+            Process(item);
+    }
+
+    public Task ProcessAsync(ChannelReader<T> reader)
+    => ProcessAsync(reader.ReadAllAsync());
 
     private void Clean()
     {
