@@ -7,9 +7,9 @@ static class Program
 {
     private static async Task Main()
     {
-        Console.WriteLine(Iterative(new(1_000, new(0)), Generator()));
-        Console.WriteLine(await ChannelAsync(new(1_000, new(0)), Generator()));
-        Console.WriteLine(Enumerable(new(1_000, new(0)), Generator()));
+        Console.WriteLine(Run(Iterative, Generator()));
+        Console.WriteLine(await Run(ChannelAsync, Generator()));
+        Console.WriteLine(Run(Enumerable, Generator()));
 
         static int Iterative<T>(CVM<T> cvm, IEnumerable<T> rng)
         {
@@ -50,5 +50,8 @@ static class Program
         => new Random(0)
             .Generate(static rng => rng.Next(1_000_000))
             .Take(1_000_000);
+
+        static TResult Run<TItem, TResult>(Func<CVM<TItem>, IEnumerable<TItem>, TResult> process, IEnumerable<TItem> generator)
+        => process(new(1_000, new(0)), generator);
     }
 }
