@@ -7,23 +7,21 @@ static class Program
 {
     private static async Task Main()
     {
-        Console.WriteLine(Iterative(new(1_000, new(0))));
-        Console.WriteLine(await ChannelAsync(new(1_000, new(0))));
-        Console.WriteLine(Enumerable(new(1_000, new(0))));
+        Console.WriteLine(Iterative(new(1_000, new(0)), Generator()));
+        Console.WriteLine(await ChannelAsync(new(1_000, new(0)), Generator()));
+        Console.WriteLine(Enumerable(new(1_000, new(0)), Generator()));
 
-        static int Iterative(CVM<int> cvm)
+        static int Iterative<T>(CVM<T> cvm, IEnumerable<T> rng)
         {
-            var rng = new Random(0);
-
-            for (var i = 0; i < 1_000_000; i++)
-                cvm.Process(rng.Next(1_000_000));
+            foreach (var item in rng)
+                cvm.Process(item);
 
             return cvm.Count;
         }
 
-        static async Task<int> ChannelAsync(CVM<int> cvm)
+        static async Task<int> ChannelAsync<T>(CVM<T> cvm, IEnumerable<T> rng)
         {
-            var _channel = Channel.CreateBounded<int>(new BoundedChannelOptions(1)
+            var _channel = Channel.CreateBounded<T>(new BoundedChannelOptions(1)
             {
                 SingleReader = true,
                 SingleWriter = true,
@@ -36,21 +34,21 @@ static class Program
 
             async Task GenerateAsync()
             {
-                var rng = new Random(0);
-
-                for (var i = 0; i < 1_000_000; i++)
-                    await _channel.Writer.WriteAsync(rng.Next(1_000_000));
+                foreach (var item in rng)
+                    await _channel.Writer.WriteAsync(item);
                 _channel.Writer.Complete();
             }
         }
 
-        static int Enumerable(CVM<int> cvm)
+        static int Enumerable<T>(CVM<T> cvm, IEnumerable<T> rng)
         {
-            var rng = new Random(0);
-
-            cvm.Process(rng.Generate(static rng => rng.Next(1_000_000)).Take(1_000_000));
-
+            cvm.Process(rng);
             return cvm.Count;
         }
+
+        static IEnumerable<int> Generator()
+        => new Random(0)
+            .Generate(static rng => rng.Next(1_000_000))
+            .Take(1_000_000);
     }
 }
