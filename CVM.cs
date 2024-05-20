@@ -6,7 +6,7 @@ namespace CVM;
 public partial class CVM<T>([Field]int memory, [Field(Type = typeof(Random), AssignFormat = "{0} ?? Random.Shared")]Random? rng = default)
 {
     private int _round = 0;
-    private LinkedList<T> _storage = new();
+    private readonly LinkedList<T> _storage = new();
 
     private bool IsFull => _storage.Count >= _memory;
 
