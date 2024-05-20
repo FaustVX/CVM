@@ -9,6 +9,7 @@ static class Program
     {
         Console.WriteLine(Iterative(new(1_000, new(0))));
         Console.WriteLine(await ChannelAsync(new(1_000, new(0))));
+        Console.WriteLine(Enumerable(new(1_000, new(0))));
 
         static int Iterative(CVM<int> cvm)
         {
@@ -41,6 +42,15 @@ static class Program
                     await _channel.Writer.WriteAsync(rng.Next(1_000_000));
                 _channel.Writer.Complete();
             }
+        }
+
+        static int Enumerable(CVM<int> cvm)
+        {
+            var rng = new Random(0);
+
+            cvm.Process(rng.Generate(static rng => rng.Next(1_000_000)).Take(1_000_000));
+
+            return cvm.Count;
         }
     }
 }

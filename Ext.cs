@@ -10,4 +10,10 @@ public static class Ext
 
     public static bool NextBool(this Random rng, int power)
     => rng.Next(_currentPower.Item1 == power ? _currentPower.Item2 : (_currentPower = (power, (int)Math.Pow(2, power))).Item2) == 0;
+
+    public static IEnumerable<TResult> Generate<T, TResult>(this T obj, Func<T, TResult> func)
+    {
+        while (true)
+            yield return func(obj);
+    }
 }
