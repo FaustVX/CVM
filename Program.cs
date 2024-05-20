@@ -5,38 +5,42 @@ using CVM;
 
 static class Program
 {
-    private static readonly Channel<int> _channel = Channel.CreateBounded<int>(new BoundedChannelOptions(1)
-    {
-        SingleReader = true,
-        SingleWriter = true,
-        FullMode = BoundedChannelFullMode.Wait,
-    });
-
     private static async Task Main()
     {
-        var cvm = new CVM<int>(1_000, new(0));
+        Console.WriteLine(Iterative(new(1_000, new(0))));
+        Console.WriteLine(await ChannelAsync(new(1_000, new(0))));
 
-        _ = Task.Run(GenerateAsync);
+        static int Iterative(CVM<int> cvm)
+        {
+            var rng = new Random(0);
 
-        await cvm.ProcessAsync(_channel.Reader);
+            for (var i = 0; i < 1_000_000; i++)
+                cvm.Process(rng.Next(1_000_000));
 
-        Console.WriteLine(cvm.Count);
+            return cvm.Count;
+        }
 
-        cvm = new CVM<int>(1_000, new(0));
-        var rng = new Random(0);
+        static async Task<int> ChannelAsync(CVM<int> cvm)
+        {
+            var _channel = Channel.CreateBounded<int>(new BoundedChannelOptions(1)
+            {
+                SingleReader = true,
+                SingleWriter = true,
+                FullMode = BoundedChannelFullMode.Wait,
+            });
 
-        for (var i = 0; i < 1_000_000; i++)
-            cvm.Process(rng.Next(1_000_000));
+            _ = Task.Run(GenerateAsync);
+            await cvm.ProcessAsync(_channel);
+            return cvm.Count;
 
-        Console.WriteLine(cvm.Count);
-    }
+            async Task GenerateAsync()
+            {
+                var rng = new Random(0);
 
-    private static async Task GenerateAsync()
-    {
-        var rng = new Random(0);
-
-        for (var i = 0; i < 1_000_000; i++)
-            await _channel.Writer.WriteAsync(rng.Next(1_000_000));
-        _channel.Writer.Complete();
+                for (var i = 0; i < 1_000_000; i++)
+                    await _channel.Writer.WriteAsync(rng.Next(1_000_000));
+                _channel.Writer.Complete();
+            }
+        }
     }
 }
