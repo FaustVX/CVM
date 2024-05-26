@@ -8,7 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FaustVX.PrimaryParameter.SG" Version="1.5.0" />
+    <PackageReference Include="FaustVX.PrimaryParameter.SG" Version="1.5.1" />
+    <PackageReference Include="Console.Menu" Version="2.1.0" />
   </ItemGroup>
 
 </Project>

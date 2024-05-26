@@ -1,5 +1,6 @@
 ﻿using System.Threading.Channels;
 using CVM;
+using static ConsoleMenu.Helpers;
 
 // https://www.quantamagazine.org/computer-scientists-invent-an-efficient-new-way-to-count-20240516/
 
@@ -7,9 +8,14 @@ static class Program
 {
     private static async Task Main()
     {
-        Console.WriteLine(Run(Iterative, Generator()));
-        Console.WriteLine(await Run(ChannelAsync, Generator()));
-        Console.WriteLine(Run(Enumerable, Generator()));
+        while (true)
+        {
+            Console.WriteLine(await Menu<Task<int>>("Select Method :",
+                (nameof(Iterative), static () => Task.FromResult(Run(Iterative, Generator()))),
+                (nameof(ChannelAsync), static async () => await Run(ChannelAsync, Generator())),
+                (nameof(Enumerable), static () => Task.FromResult(Run(Enumerable, Generator())))));
+            Console.ReadKey();
+        }
 
         static int Iterative<T>(CVM<T> cvm, IEnumerable<T> rng)
         {
